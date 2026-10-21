@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173a32">
+  <meta name="description" content="Private household notes, tasks, shortcuts, and location summaries.">
+  <title>Home Agent</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">H</span><div><strong>Home Agent</strong><small>Your household dashboard</small></div></div>
+    <button id="signOut" class="button secondary compact" type="button" hidden>Clear session</button>
+  </header>
+  <main>
+    <section id="connection" class="panel connection">
+      <div><p class="eyebrow">PRIVATE CONNECTION</p><h1>Connect to your Home Agent</h1><p class="muted">Paste a household access token. It stays in this browser tab and is sent only to this server.</p></div>
+      <form id="tokenForm" class="token-row">
+        <label class="sr-only" for="token">Bearer token</label>
+        <input id="token" type="password" autocomplete="off" placeholder="Paste access token" required>
+        <button class="button" type="submit">Connect</button>
+      </form>
+      <p class="hint">Use HTTPS when connecting over the internet. Never paste your JWT signing secret here.</p>
+      <p id="connectStatus" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section id="dashboard" hidden>
+      <div class="welcome"><div><p class="eyebrow">HOUSEHOLD</p><h1>What needs doing?</h1></div><button id="refresh" class="button secondary" type="button">Refresh</button></div>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+      <div class="grid">
+        <section class="panel">
+          <p class="eyebrow">TASKS</p><h2>Add a task</h2>
+          <form id="taskForm" class="stack">
+            <label>Title<input name="title" maxlength="200" required placeholder="Pick up groceries"></label>
+            <label>Details <span class="optional">optional</span><textarea name="description" maxlength="2000" rows="2" placeholder="Add a reminder"></textarea></label>
+            <button class="button" type="submit">Add task</button>
+          </form>
+          <div class="list-heading"><h3>Current tasks</h3></div><ul id="tasks" class="items"></ul>
+        </section>
+        <section class="panel">
+          <p class="eyebrow">NOTES</p><h2>Save a note</h2>
+          <form id="noteForm" class="stack">
+            <label>Note<textarea name="content" maxlength="10000" rows="3" required placeholder="Remember the gate code..."></textarea></label>
+            <button class="button" type="submit">Save note</button>
+          </form>
+          <div class="list-heading"><h3>Recent notes</h3></div><ul id="notes" class="items"></ul>
+        </section>
+        <section class="panel">
+          <p class="eyebrow">SHORTCUTS</p><h2>Register a shortcut</h2>
+          <form id="shortcutForm" class="stack">
+            <label>Name<input name="name" maxlength="100" required placeholder="Start Roomba"></label>
+            <label>What it does<textarea name="description" maxlength="1000" rows="2" required placeholder="Run the robot vacuum"></textarea></label>
+            <button class="button" type="submit">Save shortcut</button>
+          </form>
+          <div class="list-heading"><h3>Registered shortcuts</h3></div><ul id="shortcuts" class="items"></ul>
+        </section>
+        <section class="panel">
+          <p class="eyebrow">LOCATION MEMORIES</p><h2>Get a summary</h2>
+          <form id="memoryForm" class="stack">
+            <label>Save a place memory
+              <input name="store_name" maxlength="200" required placeholder="Neighborhood Market">
+            </label>
+            <label>Memory type
+              <select name="store_type"><option value="grocery">Grocery</option><option value="restaurant">Restaurant</option><option value="other">Other</option></select>
+            </label>
+            <button id="currentLocation" class="button secondary" type="button">Use my current location</button>
+            <p id="locationStatus" class="status" role="status" aria-live="polite"></p>
+            <label>Latitude<input name="latitude" type="number" min="-90" max="90" step="any" required placeholder="40.7"></label>
+            <label>Longitude<input name="longitude" type="number" min="-180" max="180" step="any" required placeholder="-74.0"></label>
+            <label>Memory<textarea name="message" maxlength="2000" rows="2" required placeholder="The sourdough is great"></textarea></label>
+            <button class="button" type="submit">Save place memory</button>
+          </form>
+          <div class="list-heading"></div>
+          <h3>Summarize a place</h3>
+          <form id="summaryForm" class="stack">
+            <label>Place name<input name="store_name" maxlength="200" required placeholder="Neighborhood Market"></label>
+            <label>Place type<select name="store_type"><option value="grocery">Grocery</option><option value="restaurant">Restaurant</option><option value="">Other</option></select></label>
+            <button class="button" type="submit">Get summary</button>
+          </form>
+          <div id="summary" class="summary" hidden></div>
+        </section>
+      </div>
+    </section>
+  </main>
+  <footer>Home Agent · Keep your access token private.</footer>
+  <script src="/app.js" defer></script>
+</body>
+</html>

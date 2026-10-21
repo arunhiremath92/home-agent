@@ -1,0 +1,22 @@
+[Unit]
+Description=Home Agent API
+Wants=network-online.target
+After=network-online.target postgresql.service ollama.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=home-agent
+Group=home-agent
+EnvironmentFile=/etc/home-agent/agent.env
+WorkingDirectory=/var/lib/home-agent
+ExecStart=/usr/local/bin/agent-server
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,10 @@
+.git
+.env
+.env.*
+**/__pycache__
+agent-server/scripts
+agent-server/**/_test.go
+agent-server/README.md
+agent-server/main
+locationdata.json
+how-to-run.md

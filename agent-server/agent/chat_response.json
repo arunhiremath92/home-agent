@@ -1,0 +1,39 @@
+{
+    "choices": [
+        {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+                "content": "A Python script filled with dread,\nHad exceptions filling its head.\nWith `try` and with `except`,\nHe handled the defect,\nAnd kept the whole program well-fed.",
+                "reasoning_content": "Thinking Process:\n\n1.  **Analyze the Request:** The user wants a limerick about \"Python exceptions.\"\n2.  **Understand Limerick Structure:**\n    *   Rhyme scheme: AABBA (Lines 1, 2, 5 rhyme; Lines 3, 4 rhyme).\n    *   Rhythm/Meter: Anapestic (da-da-DUM, da-da-DUM, da-da-DUM). Usually anapestic trimeter for lines 1, 2, 5, and dimeter for lines 3, 4.\n3.  **Identify Key Concepts (Python Exceptions):**\n    *   `try`, `except`, `raise`.\n    *   Errors, bugs, crashes, handling.\n    *   Specific types (TypeError, ValueError, etc.).\n    *   The flow of code being interrupted.\n4.  **Drafting - Focus on a scenario:** Let's focus on a program failing.\n\n    *   *Attempt 1 (Focus on the act of raising):*\n        A coder whose program went wrong, (A)\n        Had errors where they didn't belong. (A)\n        A `try` block he made, (B)\n        A mistake was displayed, (B)\n        With an exception, all broke the song. (A) -> *A bit weak rhyme/flow.*\n\n    *   *Attempt 2 (Focus on the feeling of catching the error):*\n        A script that encountered a fright, (A)\n        Fell into an exception's plight. (A)\n        With `try` and with `except`, (B)\n        He neatly caught the defect, (B)\n        And made the whole system feel right. (A) -> *Better flow, clear theme.*\n\n5.  **Final Polish (Checking rhythm and rhyme):**\n\n    *   Line 1: A coder whose program went wrong, (Good meter)\n    *   Line 2: Had errors where they didn't belong. (Good rhyme with wrong)\n    *   Line 3: A `try` block he made, (Short, punchy)\n    *   Line 4: A mistake was displayed, (Good rhyme with made)\n    *   Line 5: With an exception, he'd throng. (Wait, \"throng\" doesn't fit the meaning. Let's revise Line 5.)\n\n    *   *Revision 3:*\n        A Python script filled with dread, (A)\n        Had exceptions filling its head. (A)\n        With `try` and with `except`, (B)\n        He handled the defect, (B)\n        And kept the whole program well-fed. (A) -> *This works well.*\n\n6.  **Final Output Generation.** (Selecting the best version).",
+                "role": "assistant"
+            }
+        }
+    ],
+    "created": 1792186173,
+    "id": "chatcmpl-xEDafBXWdYvKGGR6Lo8gUZTt15IGUpbn",
+    "model": "ggml-org/gemma-4-E2B-it-GGUF:Q8_0",
+    "object": "chat.completion",
+    "system_fingerprint": "b11429-d81235049",
+    "timings": {
+        "cache_n": 0,
+        "draft_n": 795,
+        "draft_n_accepted": 397,
+        "predicted_ms": 9221.423,
+        "predicted_n": 662,
+        "predicted_per_second": 71.68091085291283,
+        "predicted_per_token_ms": 13.950715582450833,
+        "prompt_ms": 1920.08,
+        "prompt_n": 30,
+        "prompt_per_second": 15.624348985458939,
+        "prompt_per_token_ms": 64.00266666666667
+    },
+    "usage": {
+        "completion_tokens": 662,
+        "prompt_tokens": 30,
+        "prompt_tokens_details": {
+            "cached_tokens": 0
+        },
+        "total_tokens": 692
+    }
+}

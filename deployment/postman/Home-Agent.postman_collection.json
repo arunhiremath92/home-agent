@@ -1,0 +1,580 @@
+{
+  "info": {
+    "_postman_id": "23b6aaec-f8e4-46c0-988e-c5632e032edd",
+    "name": "Home Agent API",
+    "description": "Requests for the Home Agent REST API. Set baseUrl and accessToken. The accessToken must be a valid bearer JWT for the configured API audience and include sub, household_id, and exp claims. Location updates require a configured Google Maps API key on the server.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "noteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "restaurantStoreName",
+      "value": "Juniper & Crumb Cafe",
+      "type": "string"
+    },
+    {
+      "key": "groceryStoreName",
+      "value": "Neighborhood Market",
+      "type": "string"
+    },
+    {
+      "key": "shortcutName",
+      "value": "Start Roomba",
+      "type": "string"
+    },
+    {
+      "key": "historyId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Check health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/healthz",
+            "description": "Liveness check."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('returns HTTP 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('reports healthy status', function () {",
+                  "  pm.expect(pm.response.json().data.status).to.eql('ok');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {
+          "name": "Create note",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Pick up the dry cleaning\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/notes",
+            "description": "Creates a note and saves its ID to the noteId collection variable for the Delete note request."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('returns HTTP 201', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "const body = pm.response.json();",
+                  "pm.test('returns the created note', function () {",
+                  "  pm.expect(body.data).to.have.property('id');",
+                  "  pm.expect(body.data.content).to.eql('Pick up the dry cleaning');",
+                  "});",
+                  "if (body.data && body.data.id) {",
+                  "  pm.collectionVariables.set('noteId', String(body.data.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List notes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/notes",
+            "description": "Lists notes, newest first."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('returns HTTP 200 and a data array', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Delete created note",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/notes/{{noteId}}",
+            "description": "Deletes the note created by Create note. Run Create note first so noteId is set."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('returns HTTP 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Buy milk\",\n  \"description\": \"2% milk\",\n  \"due_at\": \"2026-10-18T17:00:00Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/tasks",
+            "description": "Creates a task. due_at is optional and should be an RFC 3339 timestamp."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('returns HTTP 201 and a task', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  const task = pm.response.json().data;",
+                  "  pm.expect(task.title).to.eql('Buy milk');",
+                  "  pm.expect(task.status).to.eql('pending');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List pending tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/tasks?status=pending",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            },
+            "description": "Lists tasks whose status exactly matches the optional filter."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('returns HTTP 200 and a data array', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().data).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List all tasks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/v1/tasks",
+            "description": "Lists tasks without filtering by status."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Location memories",
+      "item": [
+        {
+          "name": "Create restaurant memory",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"store_type\": \"restaurant\",\n  \"store_name\": \"{{restaurantStoreName}}\",\n  \"latitude\": 40.7580,\n  \"longitude\": -73.9855,\n  \"message\": \"The croissants are excellent.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/location-memories",
+            "description": "Stores a location memory. Coordinates are example values; replace them with the actual location when needed."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('returns HTTP 201 and a location memory', function () {",
+                  "  pm.response.to.have.status(201);",
+                  "  pm.expect(pm.response.json().data.store_type).to.eql('restaurant');",
+                  "  pm.expect(pm.response.json().data).to.have.property('id');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List memories for restaurant",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/location-memories?store_name={{restaurantStoreName}}&store_type=restaurant",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "location-memories"
+              ],
+              "query": [
+                {
+                  "key": "store_name",
+                  "value": "{{restaurantStoreName}}"
+                },
+                {
+                  "key": "store_type",
+                  "value": "restaurant"
+                }
+              ]
+            },
+            "description": "store_name is required; store_type is optional."
+          }
+        },
+        {
+          "name": "Summarize restaurant memories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/location-memories/summary?store_name={{restaurantStoreName}}&store_type=restaurant",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "location-memories",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "store_name",
+                  "value": "{{restaurantStoreName}}"
+                },
+                {
+                  "key": "store_type",
+                  "value": "restaurant"
+                }
+              ]
+            },
+            "description": "Summarizes saved memories using the configured model when available, with a deterministic fallback."
+          }
+        },
+        {
+          "name": "Summarize grocery list",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/location-memories/summary?store_name={{groceryStoreName}}&store_type=grocery",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "location-memories",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "store_name",
+                  "value": "{{groceryStoreName}}"
+                },
+                {
+                  "key": "store_type",
+                  "value": "grocery"
+                }
+              ]
+            },
+            "description": "Summarizes pending tasks as a grocery shopping list for this store. Create tasks first to populate the list."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Location updates",
+      "item": [
+        {
+          "name": "Plan from location update",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"latitude\": 40.7580,\n  \"longitude\": -73.9855\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": "{{baseUrl}}/api/v1/location-updates",
+            "description": "Classifies pending tasks, resolves this location, searches nearby relevant places, estimates mock home actions, and returns registered Shortcut suggestions. Requires Geocoding, Places API (New), and Routes enabled for GOOGLE_MAPS_API_KEY."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('returns HTTP 200 and structured route data', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const data = pm.response.json().data;",
+                  "  pm.expect(data.routes).to.be.an('array');",
+                  "  pm.expect(data).to.have.property('task_recommendation');",
+                  "  pm.expect(data.suggested_shortcuts).to.be.an('array');",
+                  "  pm.expect(data).to.have.property('message');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Automation setup and history",
+          "item": [
+            {
+              "name": "Set home location",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"latitude\": 40.7580,\n  \"longitude\": -73.9855,\n  \"radius_meters\": 150\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/api/v1/settings/home-location",
+                "description": "Configure the home geofence. Replace the public sample coordinates with your own home coordinates; the default radius is 150 meters."
+              }
+            },
+            {
+              "name": "Get home location",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/settings/home-location"
+              }
+            },
+            {
+              "name": "Register or update Apple Shortcut",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"{{shortcutName}}\",\n  \"description\": \"Start the robot vacuum when I am home and a pending cleaning task can be done.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": "{{baseUrl}}/api/v1/shortcuts",
+                "description": "Register the exact Shortcut name as it appears in Apple's Shortcuts app, and describe when it is appropriate. Reposting a name updates its description."
+              }
+            },
+            {
+              "name": "List registered Shortcuts",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/shortcuts"
+              }
+            },
+            {
+              "name": "List location update history",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/location-updates/history?limit=50",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "location-updates",
+                    "history"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "50"
+                    }
+                  ]
+                },
+                "description": "Returns the most recent stored location decisions. History is retained until manually deleted."
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('returns HTTP 200 and a history array', function () {",
+                      "  pm.response.to.have.status(200);",
+                      "  const events = pm.response.json().data;",
+                      "  pm.expect(events).to.be.an('array');",
+                      "  if (events.length > 0) {",
+                      "    pm.collectionVariables.set('historyId', String(events[0].id));",
+                      "  }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Delete selected history entry",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/location-updates/history/{{historyId}}",
+                "description": "Permanently deletes the selected entry. Run List location update history first so historyId is set."
+              }
+            },
+            {
+              "name": "Delete registered Shortcut",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": "{{baseUrl}}/api/v1/shortcuts/{{shortcutName}}",
+                "description": "Removes the registered Shortcut name. Ensure Postman URL-encodes spaces in the Shortcut name."
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

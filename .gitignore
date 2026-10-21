@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+*.py[cod]
+__pycache__/
+agent-server/main
+locationdata.json
